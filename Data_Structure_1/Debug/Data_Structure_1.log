@@ -1,10 +1,9 @@
-﻿生成启动时间为 2015/6/27 17:38:05。
+﻿生成启动时间为 2015/7/2 22:09:16。
      1>项目“C:\Users\Infertom-PC\Documents\Visual Studio 2010\Projects\Data_Structure_1\Data_Structure_1\Data_Structure_1.vcxproj”在节点 2 上(build 个目标)。
      1>InitializeBuildStatus:
          正在创建“Debug\Data_Structure_1.unsuccessfulbuild”，因为已指定“AlwaysCreate”。
        ClCompile:
-         D:\Microsoft Visual Studio 10.0\VC\bin\CL.exe /c /ZI /nologo /W3 /WX- /Od /Oy- /D WIN32 /D _DEBUG /D _CONSOLE /D _UNICODE /D UNICODE /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc100.pdb" /Gd /TP /analyze- /errorReport:prompt fifo.cpp
-         fifo.cpp
+         所有输出均为最新。
        ManifestResourceCompile:
          所有输出均为最新。
        Link:
@@ -14,6 +13,7 @@
          Debug\job.obj
          Debug\main.obj
          Debug\simulator.obj
+         LINK : 没有找到 C:\Users\Infertom-PC\Documents\Visual Studio 2010\Projects\Data_Structure_1\Debug\Data_Structure_1.exe 或上一个增量链接没有生成它；正在执行完全链接
        Manifest:
          C:\Program Files (x86)\Microsoft SDKs\Windows\v7.0A\bin\mt.exe /nologo /verbose /out:"Debug\Data_Structure_1.exe.embed.manifest" /manifest Debug\Data_Structure_1.exe.intermediate.manifest
          所有输出均为最新。
@@ -27,4 +27,4 @@
 
 生成成功。
 
-已用时间 00:00:01.38
+已用时间 00:00:01.28

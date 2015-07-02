@@ -1,77 +1,53 @@
-#include <iostream>
-#include <fstream>
 
-using namespace std;
-//#define DEBUG
+#include<iostream>   
+using namespace std;   
+#include "fifo.h"   
 
-#include "fifo.h"
+fifo::fifo(int seconds_per_page):simulator(seconds_per_page){}   
 
-void fifo::simulate(string file){
-	loadworkload(file);
-	int total = workload.size();
-	int latency = 0;
+void fifo::simulate(string file){   
+	loadworkload(file);   
+
+	queue<event> waiting;//等待队列   
+	queue<event> servicing;//进行队列   
+
+	int time = 0;//进行时间     
+	int service_time = workload.front().arrival_time();   
+	float aggregate_latency = 0;   
+	event e;
+	int totaljob = workload.size();
 
 	cout<<"FIFO Simulation"<<endl<<endl;
 
-	queue<event> waitEvent;
-	int systemTime = 1, remainTime = 0;
-	event currentEvent, currentWaitEvent;
-	bool flag1 = false, flag2 = false;
-
-	while ( !(!flag1 && !flag2 && workload.empty() && waitEvent.empty()) )
-	{
-#ifdef DEBUG
-		cout<<"workload:"<<workload.size()<<"    waitevent:"<<waitEvent.size()<<"	flag1:"<<flag1<<"	flag2:"<<flag2<<endl;
-#endif
-
-		//确保当前选定的到达任务存在
-		if ( !flag1 && !workload.empty() ) {
-			currentEvent = workload.front();
-			flag1 = true;
-			workload.pop();
-		}
-
-		//将所有与系统时间相同的任务加入等待执行队列
-		while ( flag1 && currentEvent.arrival_time() == systemTime )
-		{
-			cout<<"      Arriving: "<<currentEvent.getjob()<<" at "<<systemTime<<" second"<<((systemTime > 1)? "s":"")<<endl;
-			waitEvent.push(currentEvent);
-			if ( !workload.empty() ) {
-				currentEvent = workload.front();
-				workload.pop();
+	while(!(workload.empty() && waiting.empty() && servicing.empty()) ){   
+		while( !workload.empty() && workload.front().arrival_time() == time ){    
+			e = workload.front();
+			workload.pop();         
+			cout << "\tArriving:  " << e.getjob() << " at " << time <<" seconds "<<  endl;         
+			if( servicing.empty() ){   
+				servicing.push(e);          
+				cout << "\tServicing:  " << servicing.front().getjob() << " at " << time <<" seconds "<<  endl;   
 			}
-			else flag1 = false;
+			else waiting.push(e);
 		}
 
-		//确保当前选定的执行任务存在
-		if ( !flag2 && !waitEvent.empty() ){
-			currentWaitEvent = waitEvent.front();
-			flag2 = true;
-			waitEvent.pop();
+		if( !waiting.empty() && servicing.empty() ){   
+			e = waiting.front();
+			waiting.pop();    
+			servicing.push(e);
+			aggregate_latency += service_time - e.arrival_time();
+			cout << "\tServicing:  " << servicing.front().getjob() << " at " << time <<" seconds "<<  endl; 
+		}   
+
+		if( !servicing.empty() && servicing.front().getjob().getnumpages() * seconds_per_page + service_time - 1 == time ){   
+			service_time = time + 1;
+			servicing.pop();   
 		}
 
-		//当上一个任务执行时间为0时执行当前任务，并重置剩余时间
-#ifdef DEBUG
-		cout<<"xxx:"<<(currentWaitEvent.arrival_time() + seconds_per_page * currentWaitEvent.getjob().getnumpages())<<endl;
-#endif
-		if ( flag2 && !remainTime )
-		{
-			cout<<"      Servicing: "<<currentWaitEvent.getjob()<<" at "<<systemTime<<" second"<<((systemTime > 1)? "s":"")<<endl;
-			remainTime = seconds_per_page * currentWaitEvent.getjob().getnumpages();
-			latency += systemTime - currentWaitEvent.arrival_time();
-			if ( !waitEvent.empty() ){
-				currentWaitEvent = waitEvent.front();
-				waitEvent.pop();
-			}
-			else flag2 = false;
-		}
+		time++;
+	}   
 
-		systemTime++;
-		if ( remainTime ) remainTime--;
-	}
-
-	cout<<endl
-		<<"      Total jobs: "<<total<<endl
-		<<"      Aggregate latency: "<<latency<<" second"<<((latency > 1)? "s":"")<<endl
-		<<"      Mean latency: "<<(1.0 * latency / total)<<" seconds "<<endl;
-};
+	cout<< endl << "\tTotal jobs: " << totaljob << endl
+		<< "\tAggregate latency: " << aggregate_latency <<" seconds " << endl
+		<< "\tMean latency: " << aggregate_latency/totaljob <<" seconds" << endl;     
+}  
